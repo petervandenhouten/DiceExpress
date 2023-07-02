@@ -1,0 +1,10 @@
+Card set ideais
+
+"Football"
+Group = teams
+Card = Player
+Dice/line = skills 
+A = Keeper
+B = Attack/Goals
+C = Defend/Tackes
+Points = Cups/Prices
