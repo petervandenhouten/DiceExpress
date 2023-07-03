@@ -81,7 +81,11 @@ namespace DiceExpressGameEngine
 
         public GameCardLine GetFreeLine(string line)
         {
-            if (string.IsNullOrEmpty(line)) return null;
+            if (string.IsNullOrEmpty(line))
+            {
+                // no match with any line. 
+                return null;
+            }
             return this.m_lines.FirstOrDefault(x => (x.ToString() == line && x.IsFree()), null);
         }
 

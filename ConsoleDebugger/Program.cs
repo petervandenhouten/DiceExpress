@@ -16,9 +16,9 @@ namespace ConsoleDebugger // Note: actual namespace depends on the project name.
             var set = CardFactory.DefaultSet();
 
             var game = new GameEngine(set);
-            game.AddPlayer("Peter", CardChooser.Method.CardPoints);
-            game.AddPlayer("Atari", CardChooser.Method.EasyCard);
-            game.AddPlayer("Paul", CardChooser.Method.CardPoints);
+            game.AddPlayer("Peter", CardChooser.Method.CardOnTable);
+            game.AddPlayer("Atari", CardChooser.Method.CardOnTable);
+            game.AddPlayer("Paul", CardChooser.Method.CardOnTable);
 
             bool stop = false;
 
@@ -46,12 +46,18 @@ namespace ConsoleDebugger // Note: actual namespace depends on the project name.
 
                 var key = Console.ReadKey();
 
-                if ( key.Key == ConsoleKey.X || set.NumberOfCardsOnTable() == 0)
+                if ( key.Key == ConsoleKey.X || game.IsFinished())
                 {
                     stop = true;
                 }
 
                 game.NextPlayer();
+            }
+
+            if ( game.IsFinished() ) 
+            {
+                Console.WriteLine("*** Game Finished ***");
+                printScore(game, set);
             }
         }
 
@@ -77,7 +83,10 @@ namespace ConsoleDebugger // Note: actual namespace depends on the project name.
             Console.WriteLine("Chosen card: {0} {1} {2}", card.Name, selected.Line, (card.HasOwner() ? "(Steal attempt)" : ""));
 
             var line = card.GetFreeLine(selected.Line);
-            line.SetOccupied();
+            if (line != null)
+            {
+                line.SetOccupied();
+            }
 
             if (card.IsFull())
             {
@@ -91,7 +100,7 @@ namespace ConsoleDebugger // Note: actual namespace depends on the project name.
 
             PrintCard(card);
 
-            while ( !card_won && !card_lost)
+            while ( !game.IsFinished() && !card_won && !card_lost)
             {
                 var dices = DiceThrower.Throw(nr_dices);
                 PrintDiceSet(dices);

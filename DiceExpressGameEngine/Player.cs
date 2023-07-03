@@ -12,14 +12,14 @@ namespace DiceExpressGameEngine
 
         private string m_name;
         private int m_score;
+        public string Name { get { return m_name; } }
+        public int Score { get { return m_score; } }
+        public CardChooser.Method CardChooseMethod { get; set; }
 
-        public string Name { get { return m_name; } }  
-        public int Score { get { return m_score; }}
-
-        
-        public Player(string name)
+        public Player(string name, CardChooser.Method method)
         {
             m_name = name;
+            CardChooseMethod = method;
         }
 
         public void SetScore(int score)

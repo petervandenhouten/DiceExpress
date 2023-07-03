@@ -86,7 +86,7 @@ namespace DiceExpressGameEngine
 
         private int GetMinimumNumberDicesRequiredForNumbers(GameCardLine line, DiceSet dices)
         {
-            int point_of_line = line.GetPoints();
+            int point_of_line = line.GetTotalOfNumbers();
 
             // Dices with highest numbers first in list
             dices.Sort((a, b) => { return b.GetPoints().CompareTo(a.GetPoints()); });
@@ -147,7 +147,7 @@ namespace DiceExpressGameEngine
 
         private bool CheckMatchingNumbers(DiceSet dices, GameCardLine line)
         {
-            int points_of_line  = line.GetPoints();
+            int points_of_line  = line.GetTotalOfNumbers();
             int points_of_dices = dices.GetPoints();
 
             return (points_of_dices >= points_of_line);
@@ -168,18 +168,20 @@ namespace DiceExpressGameEngine
             {
                 var s = line.GetSymbol(i, stealing);
 
-                int pos = dices_str.IndexOf(s);
+                if (!string.IsNullOrEmpty(s))
+                {
+                    int pos = dices_str.IndexOf(s);
 
-                if (pos < 0)
-                {
-                    match = false;
-                    break;
+                    if (pos < 0)
+                    {
+                        match = false;
+                        break;
+                    }
+                    else
+                    {
+                        dices_str = dices_str.Remove(pos, 1);
+                    }
                 }
-                else
-                {
-                    dices_str = dices_str.Remove(pos, 1);
-                }
-;
             }
 
             return match;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,15 +29,26 @@ namespace DiceExpressGameEngine
             m_cards = cards;
         }
 
+        // todo player has strategy
         public void AddPlayer(string name, CardChooser.Method method)
         {
-            var player = new Player(name);
+            var player = new Player(name, method);
             m_players.Add(player);
         }
 
         public CardChooser GetCardChooser(string name)
         {
+            var player = GetPlayerByName(name);
+            if (player != null)
+            {
+                return new CardChooser(player.CardChooseMethod);
+            }
             return new CardChooser();
+        }
+
+        private Player GetPlayerByName(string name)
+        {
+            return m_players.FirstOrDefault(x => x.Name == name, null);
         }
 
         public void NextPlayer()
@@ -90,7 +102,10 @@ namespace DiceExpressGameEngine
             var card = m_cards.GetCardByName(m_name_of_played_card);
             card.StartPlaying(stealing: !card.OnTable());
             var line = card.GetFreeLine(chosen_card.Line);
-            line.SetOccupied();
+            if (line != null)
+            {
+                line.SetOccupied();
+            }
 
             if (card.IsFull())
             {

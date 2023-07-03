@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,23 +50,33 @@ namespace DiceExpressGameEngine
         {
             if (index < 0 || index >= Length) return string.Empty;
             char symbol = m_symbols[index];
-            if (stealing && symbol == 'D')
+            if (symbol == 'D')
             {
-                symbol = 'C';
+                if (stealing)
+                {
+                    // convert to C
+                    symbol = 'C';
+                }
+                else
+                {
+                    // Does not apply
+                    return "";
+                }
             }
             return symbol.ToString();
         }
 
         public bool HasSymbols()
         {
-            return !HasNumbers();
+            string allowedchar = "ABCD";
+            return m_symbols.All(x => allowedchar.Contains(x));
         }
         public bool HasNumbers()
         {
             return ToString().All(char.IsDigit);
         }
 
-        public int GetPoints()
+        public int GetTotalOfNumbers()
         {
             if (HasSymbols()) return 0;
             return int.Parse(ToString());

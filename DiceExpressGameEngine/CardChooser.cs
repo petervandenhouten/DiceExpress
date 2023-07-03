@@ -26,7 +26,7 @@ namespace DiceExpressGameEngine
         private readonly List<CardScore> m_scores = new List<CardScore>();
         private Method m_method;
 
-        public enum Method { Human, GroupPoints, CardPoints, StealOfOpponents, EasyCard}
+        public enum Method { Human, GroupPoints, CardPoints, StealOfOpponents, EasyCard, CardOnTable}
 
         public IList<CardScore> Scores {  get { return m_scores; } }
 
@@ -78,10 +78,23 @@ namespace DiceExpressGameEngine
                 case Method.EasyCard:
                     return GetScoreBasedOnEasyCardPoints(entry);
 
+                case Method.CardOnTable:
+                    return GetScoreBasedOnCardOnTable(entry);
+
                 case Method.CardPoints:
                 default:
                     return GetScoreBasedOnCardPoints(entry);
             }
+        }
+
+        private double GetScoreBasedOnCardOnTable(DiceMatchEntry entry)
+        {
+            double score = GetScoreBasedOnCardPoints(entry);
+            if ( !entry.Card.OnTable() )
+            {
+                score = 0;
+            }
+            return score;
         }
 
         private double GetScoreBasedOnEasyCardPoints(DiceMatchEntry entry)

@@ -50,6 +50,7 @@ namespace UnitTestsGameEngine
                     {
                     }
                 }
+                Console.WriteLine("Turns={0} CardOnTable={1}", game.NumberOfTurns, set.NumberOfCardsOnTable());
 
                 Assert.IsTrue(game.NumberOfTurns < 300);
 

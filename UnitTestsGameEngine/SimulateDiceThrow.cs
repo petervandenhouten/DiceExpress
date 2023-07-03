@@ -26,13 +26,13 @@ namespace UnitTestsGameEngine
             histogram.Add("2", 0);
             histogram.Add("3", 0);
 
-            for (int i=0; i<n; i++)
+            for (int i = 0; i < n; i++)
             {
                 var c = new Dice();
                 histogram[c.ToString()]++;
             }
 
-            foreach(var entry in histogram)
+            foreach (var entry in histogram)
             {
                 Console.WriteLine("{0}: {1}", entry.Key, entry.Value);
             }
@@ -51,9 +51,40 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_One_Value()
+        public void When_3_Dices_Are_Thrown_What_Is_The_Probability_Of_Two_Symbols()
         {
-            const long n = 100000;
+            const long n = 150000;
+            const int d = 3;
+            long x = 0;
+            for (int i = 0; i < n; i++)
+            {
+                var dices = DiceThrower.Throw(d);
+
+                if (dices.HasAtLeast("A", 1) || dices.HasAtLeast("B", 1))
+                {
+                    x++;
+                }
+            }
+
+            double p_sim = (double)x / n;
+
+            Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
+
+            var f = ChanceCalculator.GetProbabilityForSymbolWithMultipleDices(d);
+            double p_formula = f.ToDouble();
+            Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
+
+            double difference = Math.Abs(p_sim - p_formula);
+            double rel_dif = difference / p_formula;
+            Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
+
+            Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
+        }
+
+        [TestMethod]
+        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_At_Least_One_Symbol()
+        {
+            const long n = 150000;
             const int d = 7;
             long x = 0;
             for (int i = 0; i < n; i++)
@@ -78,13 +109,14 @@ namespace UnitTestsGameEngine
             double rel_dif = difference / p_formula;
             Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
 
-            Assert.IsTrue(rel_dif < 0.05);
+            Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
         }
 
+
         [TestMethod]
-        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_Two_The_Same()
+        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_At_Least_Two_Symbols()
         {
-            const long n = 100000;
+            const long n = 150000;
             long x = 0;
             int d = 7;
             for (int i = 0; i < n; i++)
@@ -101,7 +133,8 @@ namespace UnitTestsGameEngine
 
             Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
 
-            var f = ChanceCalculator.GetProbabilityForCombinationWithMultipleDices(d);
+            //var f = ChanceCalculator.GetProbabilityForCombinationWithMultipleDices(d);
+            var f = ChanceCalculator.GetProbabilityForLine("AA", 7);
             double p_formula = f.ToDouble();
             Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
 
@@ -109,9 +142,77 @@ namespace UnitTestsGameEngine
             double rel_dif = difference / p_formula;
             Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
 
-            Assert.IsTrue(rel_dif < 0.05);
+            Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
 
         }
 
+        [TestMethod]
+        public void When_2_Dices_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
+        {
+            const long n = 150000;
+            long x = 0;
+            int d = 2;
+            for (int i = 0; i < n; i++)
+            {
+                var dices = DiceThrower.Throw(d);
+
+                if (dices.HasAtLeast("A", 1) && dices.HasAtLeast("B", 1))
+                {
+                    x++;
+                }
+            }
+
+            double p_sim = (double)x / n;
+
+            Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
+
+            var f = ChanceCalculator.GetProbabilityForLine("AB", 2);
+            double p_formula = f.ToDouble();
+            Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
+
+            double difference = Math.Abs(p_sim - p_formula);
+            double rel_dif = difference / p_formula;
+            Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
+
+            var expected = (f * n).ToDouble();
+            var error = Math.Abs(expected - x);
+            var rel_error = error / expected;
+
+            Assert.IsTrue(Math.Abs(rel_error) < 0.05);
+            //Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
+
+        }
+
+        [TestMethod]
+        public void When_3_Dices_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
+        {
+            const long n = 150000;
+            long x = 0;
+            int d = 3;
+            for (int i = 0; i < n; i++)
+            {
+                var dices = DiceThrower.Throw(d);
+
+                if (dices.HasAtLeast("A", 1) && dices.HasAtLeast("B", 1))
+                {
+                    x++;
+                }
+            }
+
+            double p_sim = (double)x / n;
+
+            Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
+
+            var f = ChanceCalculator.GetProbabilityForLine("AB", 3);
+            double p_formula = f.ToDouble();
+            Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
+
+            double difference = Math.Abs(p_sim - p_formula);
+            double rel_dif = difference / p_formula;
+            Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
+
+            Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
+
+        }
     }
 }
