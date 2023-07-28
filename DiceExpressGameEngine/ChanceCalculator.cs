@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Mehroz;
 
 namespace DiceExpressGameEngine
@@ -18,6 +20,94 @@ namespace DiceExpressGameEngine
         // n = number of dices
         // p = change for a side (1/6)
         // r = number of success 
+
+        static public long FactorialDivision(int topFactorial, int divisorFactorial)
+        {
+            long result = 1;
+            for (int i = topFactorial; i > divisorFactorial; i--)
+                result *= i;
+            return result;
+        }
+
+        static public long NumberOfCombinations(int n)
+        {
+            if (n == 0) return 0;
+            return Factorial(n);
+        }
+
+        /// <summary>
+        /// Combinations: Unordered Sampling without Replacement:
+        /// The number of k combinations of an n element.
+        /// N = total number of objects
+        /// k = number of objects selected/chosen at one time
+        /// </summary>
+        static public long NumberOfCombinations(int n, int k)
+        {
+            return n_over_k(n, k);
+        }
+
+        static public long n_over_k(int n, int k)
+        {
+            if (n == 0) return 0;
+            return NumberOfPermutations(n, k) / Factorial(k);
+        }
+
+        static public long NumberOfPossibleOutcomes(int dices)
+        {
+            if (dices == 0) return 0;
+            return OrderedSamplingWithReplacement(Sides, dices);
+        }
+
+        /// <summary>
+        /// OrderedSamplingwithReplacement
+        /// N = total number of elements
+        /// k = number of samples
+        /// </summary>
+        static public long OrderedSamplingWithReplacement(int n, int k)
+        {
+            return (long)Math.Pow(n, k);
+        }
+
+        static public long NumberOfCombinationsForDices(int dices)
+        {
+            // n = dices + Sides - 1;
+            // k = dices;
+            return UnorderedSamplingWithReplacement(Sides, dices);
+        }
+
+        /// <summary>
+        /// H = (k + n–1) over (k)
+        /// where n is the number of objects (the possible outcomes)
+        /// and k is the number of boxes (the number of rolls). 
+        /// </summary>
+        static public long UnorderedSamplingWithReplacement(int n, int k)
+        {
+            if (n == 0 || k ==0) return 0;
+            return n_over_k(n + k - 1, k);
+        }
+
+        static public long NumberOfPermutationsForDices(int dices)
+        {
+            return NumberOfPossibleOutcomes(dices);
+        }
+
+        static public long NumberOfPermutations(int n)
+        {
+            if (n == 0) return 0;
+            return Factorial(n);
+        }
+
+        /// <summary>
+        /// Permutations: Ordered Sampling without Replacement
+        /// Possible arrangements (orders) of n objects
+        /// The number of k permutations of n distinguishable objects
+        /// n=objects, k=selected/chosen
+        /// </summary>
+        static public long NumberOfPermutations(int n, int k)
+        {
+            if (n == 0) return 0;
+            return FactorialDivision(n, n - k);
+        }
 
         static public Fraction GetProbabilityForLine(string str, int dices)
         {
@@ -51,6 +141,10 @@ namespace DiceExpressGameEngine
             }
             else if (line.Length == 2 && line.HasSymbols() && line.HasIdenticalSymbols())
             {
+                var n = NumberOfCombinationsForDices(dices);
+                var combinations_aa = OrderedSamplingWithReplacement(2, dices);
+                return new Fraction(combinations_aa, n);
+
                 // Two identical symbols AA
                 // For 2 dices, 1 combination of 36 possibilities gives a success
 
@@ -78,6 +172,15 @@ namespace DiceExpressGameEngine
             }
             else if (line.Length == 2 && line.HasSymbols() &&  !line.HasIdenticalSymbols())
             {
+                // 3 dices
+                var n = NumberOfCombinationsForDices(dices);
+                var nrSymbols = 2;
+                var nxBoxes = dices;
+                var combinations_ab = NumberOfCombinations(6, 2);
+
+                return new Fraction(combinations_ab, n);
+                // '-------------------'
+
                 // Two diffrent symbols AB. It means AB and BA are valid.
                 // For 2 dices, 2 combinations of 36 possibilities gives a success
                 // For 3 dices, 3x(2*6) = 36? combinations of 216 possibilities gives a success
@@ -169,8 +272,8 @@ namespace DiceExpressGameEngine
             Fraction num2 = p ^ x;
             Fraction num3 = (1 - p) ^ (n - x);
 
-            int den1 = Factorial(x);
-            int den2 = Factorial(n - x);
+            var den1 = Factorial(x);
+            var den2 = Factorial(n - x);
             return (num1*num2*num3) / (den1*den2);
         }
 
@@ -199,7 +302,7 @@ namespace DiceExpressGameEngine
             return g;
         }
 
-        static public int Factorial(int f)
+        static public long Factorial(int f)
         {
             if (f==0)
             {
@@ -207,7 +310,7 @@ namespace DiceExpressGameEngine
             }
             else
             {
-                return f * Factorial(f - 1);
+                return (long)f * Factorial(f - 1);
             }
         }
     }

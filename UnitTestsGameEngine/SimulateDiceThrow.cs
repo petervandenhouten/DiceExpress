@@ -14,7 +14,7 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_Dice_Is_Throw()
+        public void When_Die_Is_Throw()
         {
             const long n = 200000;
 
@@ -51,7 +51,7 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_3_Dices_Are_Thrown_What_Is_The_Probability_Of_Two_Symbols()
+        public void When_3_Dice_Are_Thrown_What_Is_The_Probability_Of_Two_Symbols()
         {
             const long n = 150000;
             const int d = 3;
@@ -82,7 +82,7 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_At_Least_One_Symbol()
+        public void When_7_Dice_Are_Thrown_What_Is_The_Probability_Of_At_Least_One_Symbol()
         {
             const long n = 150000;
             const int d = 7;
@@ -114,7 +114,7 @@ namespace UnitTestsGameEngine
 
 
         [TestMethod]
-        public void When_7_Dices_Are_Thrown_What_Is_The_Probability_Of_At_Least_Two_Symbols()
+        public void When_7_Dice_Are_Thrown_What_Is_The_Probability_Of_At_Least_Two_Symbols()
         {
             const long n = 150000;
             long x = 0;
@@ -147,7 +147,42 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_2_Dices_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
+        public void When_1_Die_Is_Thrown_What_Is_The_Probability_Of_A_Symbols()
+        {
+            const long n = 10000;
+            long x = 0;
+            int d = 1;
+            for (int i = 0; i < n; i++)
+            {
+                var dices = DiceThrower.Throw(d);
+
+                if (dices.HasAtLeast("3", 1))
+                {
+                    x++;
+                }
+            }
+
+            double p_sim = (double)x / n;
+            Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
+
+            var f = ChanceCalculator.GetProbabilityForLine("A", 1);
+            double p_formula = f.ToDouble();
+            Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
+
+            double difference = Math.Abs(p_sim - p_formula);
+            double rel_dif = difference / p_formula;
+            Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
+
+            var expected = (f * n).ToDouble();
+            var error = Math.Abs(expected - x);
+            var rel_error = error / expected;
+
+            Assert.IsTrue(Math.Abs(rel_error) < 0.05);
+
+        }
+
+        [TestMethod]
+        public void When_2_Dice_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
         {
             const long n = 150000;
             long x = 0;
@@ -184,7 +219,44 @@ namespace UnitTestsGameEngine
         }
 
         [TestMethod]
-        public void When_3_Dices_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
+        public void When_2_Dice_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Identical_Symbols()
+        {
+            const long n = 150000;
+            long x = 0;
+            int d = 2;
+            for (int i = 0; i < n; i++)
+            {
+                var dices = DiceThrower.Throw(d);
+
+                if (dices.HasAtLeast("A", 2))
+                {
+                    x++;
+                }
+            }
+
+            double p_sim = (double)x / n;
+
+            Console.WriteLine("Probability simulated {0:0.00}%", p_sim * 100);
+
+            var f = ChanceCalculator.GetProbabilityForLine("AA", 2);
+            double p_formula = f.ToDouble();
+            Console.WriteLine("Probability formula {0:0.00}%", p_formula * 100);
+
+            double difference = Math.Abs(p_sim - p_formula);
+            double rel_dif = difference / p_formula;
+            Console.WriteLine("Relative difference {0:0.00}%", rel_dif * 100);
+
+            var expected = (f * n).ToDouble();
+            var error = Math.Abs(expected - x);
+            var rel_error = error / expected;
+
+            Assert.IsTrue(Math.Abs(rel_error) < 0.05);
+            //Assert.IsTrue(Math.Abs(rel_dif) < 0.05);
+
+        }
+
+        [TestMethod]
+        public void When_3_Dice_Are_Thrown_What_Is_The_Probability_Of_A_Combination_Of_Two_Different_Symbols()
         {
             const long n = 150000;
             long x = 0;
